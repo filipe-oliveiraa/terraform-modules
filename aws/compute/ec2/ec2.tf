@@ -1,5 +1,5 @@
 resource "aws_instance" "ec2_instance" {
- 
+
   # region                               = var.ec2_instance_optional.region
   ami                         = var.ec2_instance_optional.ami
   associate_public_ip_address = var.ec2_instance_optional.associate_public_ip_address
@@ -34,7 +34,7 @@ resource "aws_instance" "ec2_instance" {
   user_data_replace_on_change = var.ec2_instance_optional.user_data_replace_on_change
   volume_tags                 = var.ec2_instance_optional.volume_tags
   vpc_security_group_ids      = var.ec2_instance_optional.vpc_security_group_ids
- 
+
   dynamic "capacity_reservation_specification" {
     for_each = var.ec2_instance_optional_block.capacity_reservation_specification != null ? [1] : []
     content {
@@ -48,7 +48,7 @@ resource "aws_instance" "ec2_instance" {
       }
     }
   }
- 
+
   dynamic "cpu_options" {
     for_each = var.ec2_instance_optional_block.cpu_options != null ? [1] : []
     content {
@@ -57,14 +57,14 @@ resource "aws_instance" "ec2_instance" {
       threads_per_core = var.ec2_instance_optional_block.cpu_options.threads_per_core
     }
   }
- 
+
   dynamic "credit_specification" {
     for_each = var.ec2_instance_optional_block.credit_specification != null ? [1] : []
     content {
       cpu_credits = var.ec2_instance_optional_block.credit_specification.cpu_credits
     }
   }
- 
+
   dynamic "ebs_block_device" {
     for_each = var.ec2_instance_optional_block.ebs_block_device != null ? var.ec2_instance_optional_block.ebs_block_device : []
     content {
@@ -80,7 +80,7 @@ resource "aws_instance" "ec2_instance" {
       volume_type           = ebs_block_device.value.volume_type
     }
   }
- 
+
   dynamic "enclave_options" {
     for_each = var.ec2_instance_optional_block.enclave_options != null ? [1] : []
     content {
@@ -95,7 +95,7 @@ resource "aws_instance" "ec2_instance" {
       virtual_name = ephemeral_block_device.value.virtual_name
     }
   }
- 
+
   dynamic "launch_template" {
     for_each = var.ec2_instance_optional_block.launch_template != null ? [1] : []
     content {
@@ -104,14 +104,14 @@ resource "aws_instance" "ec2_instance" {
       version = var.ec2_instance_optional_block.launch_template.version
     }
   }
- 
+
   dynamic "maintenance_options" {
     for_each = var.ec2_instance_optional_block.maintenance_options != null ? [1] : []
     content {
       auto_recovery = var.ec2_instance_optional_block.maintenance_options.auto_recovery
     }
   }
- 
+
   dynamic "metadata_options" {
     for_each = var.ec2_instance_optional_block.metadata_options != null ? [1] : []
     content {
@@ -122,10 +122,10 @@ resource "aws_instance" "ec2_instance" {
       instance_metadata_tags      = var.ec2_instance_optional_block.metadata_options.instance_metadata_tags
     }
   }
- 
+
   dynamic "network_interface" {
     for_each = var.ec2_instance_optional_block.network_interface != null ? var.ec2_instance_optional_block.network_interface : []
- 
+
     content {
       network_interface_id  = network_interface.value.network_interface_id
       device_index          = network_interface.value.device_index
@@ -133,7 +133,7 @@ resource "aws_instance" "ec2_instance" {
       delete_on_termination = network_interface.value.delete_on_termination
     }
   }
- 
+
   dynamic "private_dns_name_options" {
     for_each = var.ec2_instance_optional_block.private_dns_name_options != null ? [1] : []
     content {
@@ -142,9 +142,9 @@ resource "aws_instance" "ec2_instance" {
       hostname_type                        = var.ec2_instance_optional_block.private_dns_name_options.hostname_type
     }
   }
- 
+
   dynamic "root_block_device" {
- 
+
     for_each = var.ec2_instance_optional_block.root_block_device != null ? [1] : []
     content {
       delete_on_termination = var.ec2_instance_optional_block.root_block_device.delete_on_termination
@@ -157,7 +157,7 @@ resource "aws_instance" "ec2_instance" {
       volume_type           = var.ec2_instance_optional_block.root_block_device.volume_type
     }
   }
- 
+
   lifecycle {
     ignore_changes = [tags]
   }

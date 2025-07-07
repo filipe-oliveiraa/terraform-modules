@@ -36,7 +36,7 @@ variable "ec2_instance_optional" {
     vpc_security_group_ids               = optional(list(string))
   })
 }
- 
+
 variable "ec2_instance_optional_block" {
   type = object({
     capacity_reservation_specification = optional(object({

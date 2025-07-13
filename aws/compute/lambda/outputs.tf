@@ -40,7 +40,7 @@ output "signing_profile_version_arn" {
 
 output "snap_start_optimization_status" {
   description = "Optimization status of the SnapStart configuration for the Lambda function. Valid values are 'On' and 'Off'."
-  value       = aws_lambda_function.lambda_function.snap_start != null ? aws_lambda_function.lambda_function.snap_start[0].optimization_status : null
+  value       = length(aws_lambda_function.lambda_function.snap_start) > 0 ? aws_lambda_function.lambda_function.snap_start[0].optimization_status : null
 }
 
 output "source_code_size" {
@@ -59,7 +59,6 @@ output "version" {
 }
 
 output "vpc_id" {
-  description = "ID of the VPC associated with the Lambda function."
-  value       = aws_lambda_function.lambda_function.vpc_config != null ? aws_lambda_function.lambda_function.vpc_config.vpc_id : null
+  description = "The VPC ID of the Lambda function if it is configured to run within a VPC."
+  value       = length(aws_lambda_function.lambda_function.vpc_config) > 0 ? aws_lambda_function.lambda_function.vpc_config[0].vpc_id : null
 }
-  

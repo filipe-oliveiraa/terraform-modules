@@ -6,6 +6,14 @@ This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
+## [v1.0.0] - 2025-07-13
+
+### Changed
+- Refactored `snap_start_optimization_status` output to use `length(...) > 0` check instead of null comparison for improved handling of optional SnapStart blocks.
+- Updated `vpc_id` output to use indexed access with `length(...) > 0` to safely retrieve VPC ID from optional `vpc_config`, avoiding potential null access issues.
+
+---
+
 ## [v1.0.0] - 2025-07-07
 
 ### Added
@@ -23,13 +31,3 @@ This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - VPC configuration with required subnet and security group IDs
   - Dead letter queue configuration for unprocessed events
   - Tracing configuration with support for "PassThrough" and "Active" modes
-
----
-
-## [Unreleased]
-
-### Added
-
-### Changed
-
-### Fixed

@@ -20,4 +20,3 @@ resource "aws_iam_role" "iam_role" {
     }
   }
 }
-

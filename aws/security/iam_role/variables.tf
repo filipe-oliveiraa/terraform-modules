@@ -1,5 +1,5 @@
 variable "assume_role_policy" {
-  description = "The policy that grants an entity permission to assume the role."
+  description = "Assume role policy JSON string. Use EOF to define the policy."
   type        = string
 }
 

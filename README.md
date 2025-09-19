@@ -88,26 +88,3 @@ module "ec2" {
   }
 }
 ````
-
----
-
-## Versioning Strategy
-
-This repository uses **semantic versioning** (`vMAJOR.MINOR.PATCH`) with Git tags that apply to the full repo.
-
-Each module maintains a local `CHANGELOG.md` to describe its changes. When updating a module, the changelog should be updated and a new Git tag should be pushed.
-
-### Releasing a New Version
-
-```bash
-git tag v1.2.0 -m "Add metadata options to EC2 module"
-git push origin v1.2.0
-```
-
-### Example with Version Pinning
-
-```hcl
-source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/ec2?ref=v1.2.0"
-```
-
----

@@ -20,7 +20,7 @@ locals {
   ]
 
   policy_document = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Sid      = "SourceList"

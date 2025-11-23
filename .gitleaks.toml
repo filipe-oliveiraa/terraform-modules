@@ -1,0 +1,12 @@
+title = "terraform-modules gitleaks config"
+
+[allowlist]
+description = "Allow documented placeholder values that look secret-ish"
+regexes = [
+  "app/db-password",
+  "password_data"
+]
+paths = [
+  "aws/compute/Simple/ec2/README.md",
+  "aws/security/Simple/secrets_manager/secrets_manager_secret/README.md"
+]

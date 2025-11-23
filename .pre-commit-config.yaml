@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks
+        entry: gitleaks detect --redact --config .gitleaks.toml
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [commit, push]

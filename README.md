@@ -46,11 +46,6 @@ AWS-first Terraform modules built to be reusable, opinionated where it matters, 
 - Opinionated guardrails in complex modules (encryption, ownership controls, public access blocks) that are safe for production use.
 - Clear docs and outputs so consumers can plug modules into larger architectures quickly.
 
-## Secret scanning
-- Run `gitleaks detect --redact --config .gitleaks.toml` before pushing to keep the repo clean of credentials; `.gitleaks.toml` contains repo-specific allowlists.
-- GitHub Actions runs the same scan on pushes and PRs (workflow: `.github/workflows/gitleaks.yml`).
-- Optional local hook: install pre-commit (`pip install pre-commit`), run `pre-commit install`, and it will run `gitleaks detect --redact --config .gitleaks.toml` on commits/pushes (configured in `.pre-commit-config.yaml`).
-
 ## About me
 - GitHub: [github.com/filipe-oliveiraa](https://github.com/filipe-oliveiraa)
 - LinkedIn: [linkedin.com/in/filipe-amaro-oliveira](https://www.linkedin.com/in/filipe-amaro-oliveira)

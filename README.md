@@ -1,5 +1,5 @@
 
-# Terraform Modules by Filipe Oliveira
+# Terraform Modules and Tools by Filipe Oliveira
 
 AWS-first Terraform modules built to be reusable, opinionated where it matters, and easy to slot into real projects. Simple modules map 1:1 to core AWS resources; complex modules compose multiple services (and guardrails) into production-ready stacks.
 

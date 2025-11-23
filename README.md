@@ -49,4 +49,3 @@ AWS-first Terraform modules built to be reusable, opinionated where it matters, 
 ## About me
 - GitHub: [github.com/filipe-oliveiraa](https://github.com/filipe-oliveiraa)
 - LinkedIn: [linkedin.com/in/filipe-amaro-oliveira](https://www.linkedin.com/in/filipe-amaro-oliveira)
--

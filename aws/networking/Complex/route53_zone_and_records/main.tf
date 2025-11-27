@@ -10,12 +10,12 @@ locals {
     if(
       (
         try(record.alias, null) == null &&
-        length(try(record.records, [])) == 0
+        length(coalesce(try(record.records, []), [])) == 0
       )
       ||
       (
         try(record.alias, null) != null &&
-        length(try(record.records, [])) > 0
+        length(coalesce(try(record.records, []), [])) > 0
       )
     )
   ]

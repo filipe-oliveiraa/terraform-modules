@@ -21,7 +21,7 @@ Implements cross-account S3 replication using the AWS provider resource `aws_s3_
   - `destination_storage_class` (string, default `STANDARD`): Storage class for replicas.
   - `destination_kms_key_arn` (string, optional): KMS key ARN for replicas.
   - `enable_bucket_owner_enforced` (bool, default `true`): Add access control translation so destination is owner. Requires `destination_account_id` (only for cross-account).
-- `replication_role_name` (string, default `s3-replication-role`): IAM role name used by replication.
+- `replication_role_name` (string, required): IAM role name used by replication.
 - `manage_destination_bucket_policy` (bool, default `false`): Attach destination bucket policy from this module. Leave `false` when you cannot or do not need to modify the destination bucket policy.
 - `tags` (map(string), default `{}`): Tags applied to IAM role.
 

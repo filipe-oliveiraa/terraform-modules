@@ -27,7 +27,6 @@ variable "destination_account_id" {
 variable "replication_role_name" {
   description = "Name for the IAM role used by S3 replication."
   type        = string
-  default     = "s3-replication-role"
 }
 
 variable "manage_destination_bucket_policy" {

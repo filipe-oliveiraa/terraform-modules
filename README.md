@@ -1,51 +1,115 @@
+# Terraform Modules by Filipe Oliveira
 
-# Terraform Modules and Tools by Filipe Oliveira
+AWS-first Terraform modules, built to be reused rather than copied. **Simple**
+modules wrap one AWS resource and mirror its arguments; **Complex** modules
+compose several into a pattern and bring guardrails with them.
 
-AWS-first Terraform modules built to be reusable, opinionated where it matters, and easy to slot into real projects. Simple modules map 1:1 to core AWS resources; complex modules compose multiple services (and guardrails) into production-ready stacks.
-
-## What this repo offers
-- A curated AWS module catalog split into **Simple** (single-resource wrappers) and **Complex** (multi-resource patterns) to cover common infrastructure blocks.
-- Modules wired with optional dynamic blocks so you only set what you need.
-- Inputs/outputs kept consistent across modules plus examples/tests applied in a sandbox before landing here; still run your own `terraform validate/plan/apply`.
-- Extras like Lambda packaging scripts to speed up delivery alongside infra code.
-
-## Module catalog
-| Module path | Type | What it builds | Key AWS resources |
-| --- | --- | --- | --- |
-| `aws/compute/Simple/ec2` | Simple | Highly configurable EC2 instance | `aws_instance` |
-| `aws/compute/Simple/lambda/lambda` | Simple | Lambda function with optional VPC, env, code/package inputs | `aws_lambda_function` |
-| `aws/compute/Simple/lambda/lambda_permission` | Simple | Lambda invoke permission for cross-service access | `aws_lambda_permission` |
-| `aws/integration/Simple/eventbridge` | Simple | EventBridge bus/rules/targets via upstream module | EventBridge bus, rules, targets |
-| `aws/integration/Simple/sns/sns_topic` | Simple | SNS topic with FIFO/KMS/feedback options | `aws_sns_topic` |
-| `aws/integration/Simple/sns/sns_topic_subscription` | Simple | SNS subscription (HTTP/SQS/Lambda/Firehose, filters) | `aws_sns_topic_subscription` |
-| `aws/networking/Simple/security_group` | Simple | Security group with dynamic ingress/egress blocks | `aws_security_group` |
-| `aws/networking/Complex/route53_zone_and_records` | Complex | Hosted zone plus validated record set (alias/standard) | `aws_route53_zone`, `aws_route53_record` |
-| `aws/monitoring_logging/Simple/cloudwatch/cloudwatch_metric_alarm` | Simple | Metric alarm with flexible dimensions and actions | `aws_cloudwatch_metric_alarm` |
-| `aws/security/Simple/secrets_manager/secrets_manager_secret` | Simple | Secrets Manager secret with optional replica | `aws_secretsmanager_secret` |
-| `aws/security/Simple/iam/iam_user` | Simple | IAM user with optional PGP key/tags | `aws_iam_user` |
-| `aws/security/Simple/iam/iam_role` | Simple | IAM role with inline policy option | `aws_iam_role` |
-| `aws/security/Simple/iam/iam_policy` | Simple | IAM policy document wrapper | `aws_iam_policy` |
-| `aws/security/Simple/iam/iam_policy_attachment` | Simple | Attach policy to users/groups/roles | `aws_iam_policy_attachment` |
-| `aws/security/Simple/iam/iam_role_policy_attachment` | Simple | Attach policy to a role | `aws_iam_role_policy_attachment` |
-| `aws/storage/Complex/s3_static_site_cloudfront_oac` | Complex | Private S3 static site fronted by CloudFront OAC (certs, logging, headers) | `aws_s3_bucket*`, `aws_cloudfront_distribution`, `aws_cloudfront_origin_access_control`, `aws_s3_bucket_policy` |
-| `aws/storage/Complex/s3_bucket_replication` | Complex | Same- or cross-account S3 replication with IAM wiring | `aws_iam_role`, `aws_iam_role_policy`, `aws_s3_bucket_replication_configuration` |
+**[Module catalog →](CATALOG.md)** (generated from the tree, so it cannot drift)
 
 ## Using a module
-- Pin a git tag/branch: `source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/storage/Complex/s3_static_site_cloudfront_oac?ref=v1.0.0"`.
-- Run `terraform fmt`, `terraform init`, `terraform validate`, then `terraform plan/apply`.
-- Complex modules ship with README examples; Simple modules mirror AWS provider arguments for minimal cognitive load.
+
+Modules are consumed straight from git, pinned to a per-module tag:
+
+```hcl
+module "deploy_role" {
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/iam-role?ref=iam-role/v1.0.0"
+
+  assume_role_policy = data.aws_iam_policy_document.assume.json
+
+  iam_role_optional = {
+    name = "deploy"
+    tags = { Team = "platform" }
+  }
+}
+```
+
+Tags are `<module-name>/vX.Y.Z`, so each module versions independently and a fix
+to one does not bump the rest. A `git::` source takes an exact `ref` - there is
+no `~> 1.0` range without a registry in front.
+
+## What you can expect from a module
+
+Every module in the catalog has:
+
+- `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf` - the same four files,
+  the same names, everywhere.
+- A `description` and an explicit `type` on every input and output.
+- `terraform test` coverage running against a mocked provider, so the tests
+  need no credentials and cost nothing. **20 modules, 75 test cases.**
+- Version *floors* rather than pins (`>= 1.5`, `aws >= 5.0, < 7.0`): the module
+  states what it needs and the root module picks the exact version.
+
+## Design rules
+
+**Simple modules do not invent defaults.** They mirror the provider, because a
+wrapper that quietly differs from the resource it wraps is harder to reason
+about than the resource. The one exception is a default that is free, applies
+in place, and prevents a well-known compromise - `ec2` sets
+`metadata_options.http_tokens = "required"` so IMDSv2 is on unless you say
+otherwise.
+
+**Complex modules do bring guardrails.** Encryption, public access blocks,
+ownership controls, origin access control. If a Complex module leaves the unsafe
+option as the default, that is a bug rather than a preference.
+
+**Invalid calls fail at plan, not at apply.** AWS has many "one of X, Y or Z
+must be specified" rules that a fully-optional wrapper silently drops, so a bad
+call plans cleanly and then fails minutes into an apply quoting an argument you
+never typed. Those rules are encoded as variable `validation` blocks and
+resource `precondition`s, phrased in terms of this module's inputs.
+
+**Cost is surfaced, never imposed.** Access logging, tracing and customer-managed
+keys all cost money, so they stay off - but the module warns rather than staying
+silent. `check` blocks report on plan and apply and never block either:
+
+```
+Warning: Check block assertion failed
+  CloudFront access logging is off. Set logging_bucket to enable it. ...
+```
+
+Do what it asks or accept it; either way it was a decision, not an accident.
+
+**`for_each` keys are identities.** No list index ever reaches a resource
+address, directly or via a map built from one - deleting one element must not
+re-key and recreate everything after it.
 
 ## Repo layout
-- `aws/compute|integration|networking|security|storage|monitoring_logging/`: Modules grouped by domain, split into `Simple` and `Complex`.
-- `aws/test/`: Lightweight validation stacks used to exercise modules before inclusion.
-- `tools/scripts/package_lambdas_shell/package_lambdas.sh`: Helper to package mixed Node/Python Lambdas into deployable zips.
 
-## Design philosophy
-- Reusable inputs and minimal defaults; opt into advanced features.
-- Dynamic blocks to avoid null/empty clutter while keeping the full AWS surface available.
-- Opinionated guardrails in complex modules (encryption, ownership controls, public access blocks) that are safe for production use.
-- Clear docs and outputs so consumers can plug modules into larger architectures quickly.
+```
+aws/
+  compute/        ec2, lambda-function, lambda-permission
+  integration/    eventbridge, sns-topic, sns-topic-subscription
+  networking/     route53-zone-records, security-group
+  observability/  cloudwatch-metric-alarm
+  security/       iam-*, secrets-manager-secret, github-oidc-role
+  storage/        s3-bucket-replication, s3-static-site-cloudfront, s3-tfstate-backend
+tools/
+  gen-catalog.sh  regenerates CATALOG.md from the tree
+  package-lambdas/  packages mixed Node/Python Lambdas into deployable zips
+```
+
+`Simple` and `Complex` are a property of a module, not a directory level - they
+live in the catalog table.
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the module contract, the plan-time
+validation rules, the `terraform test` gotchas, and the release process.
+
+```bash
+terraform fmt -check -recursive
+
+cd aws/<domain>/<module>
+terraform init -backend=false && terraform validate && terraform test
+```
+
+CI runs the same per module, plus `tfsec` across the catalog.
+
+## License
+
+[Apache 2.0](LICENSE).
 
 ## About me
+
 - GitHub: [github.com/filipe-oliveiraa](https://github.com/filipe-oliveiraa)
 - LinkedIn: [linkedin.com/in/filipe-amaro-oliveira](https://www.linkedin.com/in/filipe-amaro-oliveira)

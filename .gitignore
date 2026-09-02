@@ -35,3 +35,12 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Provider lock files.
+#
+# Committed in a root module, ignored here on purpose: these are library
+# modules, so the lock that governs a deployment is the consumer's, not ours.
+# A lock file committed here would only ever reflect whoever last ran
+# terraform init while testing, and would never be read by anyone using the
+# module.
+.terraform.lock.hcl

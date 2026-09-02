@@ -1,0 +1,87 @@
+name: terraform
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # One job for the whole repo: fmt is cheap and a per-module matrix would just
+  # spend more time starting runners than checking files.
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.4"
+      - run: terraform fmt -check -recursive
+
+  # Discovers modules rather than listing them, so a new module is covered the
+  # moment it has a main.tf - nobody has to remember to add it here.
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.find.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: find
+        run: |
+          modules=$(find aws -mindepth 2 -maxdepth 2 -type d -exec test -f '{}/main.tf' ';' -print \
+            | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+          echo "Found: $modules"
+
+  validate:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.4"
+
+      # -backend=false: these are library modules, they have no state of their
+      # own and CI must never need cloud credentials to check them.
+      - name: init
+        working-directory: ${{ matrix.module }}
+        run: terraform init -backend=false -input=false
+
+      - name: validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate
+
+      # Every module's tests use mock_provider, so this reaches no AWS API and
+      # costs nothing. A module with no tests/ directory is skipped rather than
+      # failed, so tests can be added module by module.
+      - name: test
+        working-directory: ${{ matrix.module }}
+        run: |
+          if [ -d tests ]; then
+            terraform test
+          else
+            echo "::warning title=No tests::${{ matrix.module }} has no tests/ directory"
+          fi
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: aws
+          # Findings are reported, not enforced. Several are deliberate: the
+          # Simple modules mirror the provider rather than impose defaults, and
+          # the ones that cost money to fix are surfaced as check-block warnings
+          # in the modules themselves. Turn this to true once the catalog has a
+          # documented baseline to hold.
+          soft_fail: true

@@ -8,3 +8,19 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [commit, push]
+
+      - id: terraform-fmt
+        name: terraform fmt
+        entry: terraform fmt -recursive
+        language: system
+        files: \.tf$
+        pass_filenames: false
+
+      # CATALOG.md is generated from the tree. This is what stops it drifting
+      # the way the hand-written table in the README did.
+      - id: catalog-up-to-date
+        name: catalog is up to date
+        entry: ./tools/gen-catalog.sh --check
+        language: system
+        pass_filenames: false
+        files: ^aws/.*\.tf$

@@ -1,7 +1,13 @@
 locals {
+  # Keyed by what actually identifies a record to Route 53 - name, type, and
+  # set_identifier when routing policies make several records share a name and
+  # type. The list position is deliberately NOT part of the key: it used to be,
+  # which meant deleting one record from the middle of var.records re-keyed
+  # every record after it, and Terraform answered by destroying and recreating
+  # them. For DNS that is a short outage of records nobody touched.
   record_map = {
-    for idx, record in var.records :
-    "${record.name}_${record.type}_${idx}" => record
+    for record in var.records :
+    join("_", compact([record.name, record.type, try(record.set_identifier, null)])) => record
   }
 
   invalid_records = [

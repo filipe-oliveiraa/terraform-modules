@@ -19,4 +19,7 @@ variable "iam_role_optional" {
       policy = string
     }))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

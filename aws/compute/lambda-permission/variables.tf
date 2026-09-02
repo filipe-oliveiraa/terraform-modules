@@ -27,5 +27,8 @@ variable "lambda_permission_optional" {
     statement_id_prefix = optional(string)
   })
   #default = {} - Prefer not to define default. Don't forget to explicitly define as empty object in the module call.
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }
 

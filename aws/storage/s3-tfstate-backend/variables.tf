@@ -17,17 +17,6 @@ variable "s3_bucket_optional" {
   default = {}
 }
 
-# Variables for S3 bucket policy 
-
-# variable "s3_bucket_policy_optional" {
-#   description = "Optional parameters for the S3 bucket policy."
-#   type = object({
-#     # Simple args
-#     region              = optional(string)
-#     })
-#     default = {}
-# }
-
 # Variables for S3 bucket versioning
 variable "s3_bucket_versioning_optional" {
   description = "Optional parameters for S3 bucket versioning."

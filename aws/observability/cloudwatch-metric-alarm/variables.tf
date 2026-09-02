@@ -50,4 +50,7 @@ variable "cloudwatch_metric_alarm_optional" {
     # })))
     tags = optional(map(string))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

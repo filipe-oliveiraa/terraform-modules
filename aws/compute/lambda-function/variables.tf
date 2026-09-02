@@ -78,4 +78,7 @@ variable "lambda_function_optional" {
       mode = string                    # Tracing mode. Valid values are "PassThrough" or "Active".
     }))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

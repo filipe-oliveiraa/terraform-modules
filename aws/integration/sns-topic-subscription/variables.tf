@@ -31,4 +31,7 @@ variable "sns_topic_subscription_optional" {
     replay_policy                   = optional(string) # JSON string
   })
   #default = {}
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

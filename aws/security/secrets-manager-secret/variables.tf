@@ -15,4 +15,7 @@ variable "secretsmanager_secret_optional" {
       kms_key_id = optional(string)
     }))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

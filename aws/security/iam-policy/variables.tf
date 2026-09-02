@@ -12,4 +12,7 @@ variable "iam_policy_optional" {
     path        = optional(string)
     tags        = optional(map(string))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

@@ -1,4 +1,5 @@
 variable "ec2_instance_optional" {
+  description = "Scalar arguments of aws_instance. Every attribute is optional and maps 1:1 to the provider argument of the same name; omit the ones you do not need."
   type = object({
     region                               = optional(string)
     ami                                  = optional(string)
@@ -35,9 +36,13 @@ variable "ec2_instance_optional" {
     volume_tags                          = optional(map(string))
     vpc_security_group_ids               = optional(list(string))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }
 
 variable "ec2_instance_optional_block" {
+  description = "Nested blocks of aws_instance (root_block_device, ebs_block_device, metadata_options, ...). Each is rendered as a dynamic block only when set, so an omitted key produces no block at all."
   type = object({
     capacity_reservation_specification = optional(object({
       capacity_reservation_preference = optional(string)
@@ -111,5 +116,8 @@ variable "ec2_instance_optional_block" {
       volume_type           = optional(string)
     }))
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }
  

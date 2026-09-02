@@ -15,4 +15,7 @@ variable "iam_policy_attachment_optional" {
     roles  = optional(list(string)) # List of IAM roles to attach the policy to
     groups = optional(list(string)) # List of IAM groups to attach the policy to
   })
+
+  # Every attribute is optional, so an omitted object is a valid call.
+  default = {}
 }

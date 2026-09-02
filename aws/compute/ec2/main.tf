@@ -112,15 +112,19 @@ resource "aws_instance" "ec2_instance" {
     }
   }
 
-  dynamic "metadata_options" {
-    for_each = var.ec2_instance_optional_block.metadata_options != null ? [1] : []
-    content {
-      http_endpoint = var.ec2_instance_optional_block.metadata_options.http_endpoint
-      # http_protocol_ipv6          = var.ec2_instance_optional_block.metadata_options.http_protocol_ipv6
-      http_put_response_hop_limit = var.ec2_instance_optional_block.metadata_options.http_put_response_hop_limit
-      http_tokens                 = var.ec2_instance_optional_block.metadata_options.http_tokens
-      instance_metadata_tags      = var.ec2_instance_optional_block.metadata_options.instance_metadata_tags
-    }
+  # Always rendered, unlike the other blocks here, so that IMDSv2 is on by
+  # default. An instance that still answers IMDSv1 turns any SSRF in an app on
+  # the box into "read the instance role's credentials", which is the single
+  # most exploited EC2 misconfiguration there is. Setting http_tokens is an
+  # in-place update, so defaulting it costs nothing and replaces nothing.
+  #
+  # To opt out (and you should have a reason), set it explicitly:
+  #   metadata_options = { http_tokens = "optional" }
+  metadata_options {
+    http_endpoint               = try(var.ec2_instance_optional_block.metadata_options.http_endpoint, null)
+    http_put_response_hop_limit = try(var.ec2_instance_optional_block.metadata_options.http_put_response_hop_limit, null)
+    http_tokens                 = try(var.ec2_instance_optional_block.metadata_options.http_tokens, null) != null ? var.ec2_instance_optional_block.metadata_options.http_tokens : "required"
+    instance_metadata_tags      = try(var.ec2_instance_optional_block.metadata_options.instance_metadata_tags, null)
   }
 
   dynamic "network_interface" {
@@ -160,5 +164,35 @@ resource "aws_instance" "ec2_instance" {
 
   lifecycle {
     ignore_changes = [tags]
+
+    # aws_instance needs both an ami and an instance_type, unless a
+    # launch_template supplies them. Without this the module plans happily with
+    # neither and only fails at apply, with the provider's own
+    # "one of ami,launch_template must be specified". A precondition rather
+    # than a variable validation because the inputs live in two different
+    # variables, and cross-variable validation would raise this module's
+    # Terraform floor to 1.9.
+    precondition {
+      condition = (
+        var.ec2_instance_optional_block.launch_template != null ||
+        (var.ec2_instance_optional.ami != null && var.ec2_instance_optional.instance_type != null)
+      )
+      error_message = "Set both ec2_instance_optional.ami and ec2_instance_optional.instance_type, or supply ec2_instance_optional_block.launch_template instead. aws_instance requires an AMI and an instance type from one source or the other."
+    }
   }
 }
+# Suggestions, not requirements. A check block reports a warning on plan and
+# apply and never blocks either, which is the right strength for things that
+# cost money or would force the instance to be replaced. Silence one by doing
+# what it asks, not by deleting it.
+
+check "root_volume_encryption" {
+  assert {
+    condition = (
+      var.ec2_instance_optional_block.root_block_device == null ||
+      try(var.ec2_instance_optional_block.root_block_device.encrypted, false) == true
+    )
+    error_message = "Root volume is not explicitly encrypted. Set root_block_device.encrypted = true. This is only a warning because switching encryption on an existing instance forces EC2 to replace it - decide deliberately rather than on the next apply."
+  }
+}
+

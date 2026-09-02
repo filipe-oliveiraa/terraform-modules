@@ -106,4 +106,31 @@ resource "aws_lambda_function" "lambda_function" {
       mode = var.lambda_function_optional.tracing_config.mode #required in block
     }
   }
+
+  lifecycle {
+    # aws_lambda_function needs its code from exactly one of three places.
+    # Without this the module plans with none of them set and only fails at
+    # apply, with the provider's own
+    # "one of filename,image_uri,s3_bucket must be specified". A precondition
+    # rather than a variable validation so the message can name the module's
+    # own input path rather than the resource argument.
+    precondition {
+      condition = length(compact([
+        var.lambda_function_optional.filename,
+        var.lambda_function_optional.image_uri,
+        var.lambda_function_optional.s3_bucket,
+      ])) == 1
+      error_message = "Set exactly one of lambda_function_optional.filename, .image_uri or .s3_bucket - that is where the function's code comes from, and AWS accepts exactly one source."
+    }
+
+    # s3_key is not optional once you have chosen S3 as the source, but the
+    # provider only says so at apply.
+    precondition {
+      condition = (
+        var.lambda_function_optional.s3_bucket == null ||
+        var.lambda_function_optional.s3_key != null
+      )
+      error_message = "lambda_function_optional.s3_key is required when s3_bucket is set."
+    }
+  }
 }

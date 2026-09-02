@@ -103,7 +103,9 @@ cd aws/<domain>/<module>
 terraform init -backend=false && terraform validate && terraform test
 ```
 
-CI runs the same per module, plus `tfsec` across the catalog.
+CI runs the same per module, plus `trivy config` across the catalog.
+[SECURITY-BASELINE.md](SECURITY-BASELINE.md) records what the scanner reports
+and the position taken on each finding.
 
 ## License
 

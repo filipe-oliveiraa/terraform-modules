@@ -86,9 +86,8 @@ jobs:
           scan-type: config
           scan-ref: aws
           severity: CRITICAL,HIGH,MEDIUM
-          # Reported, not enforced. The remaining findings are deliberate:
-          # Simple modules mirror the provider rather than impose defaults, and
-          # the ones that cost money or would force a resource replacement are
-          # surfaced as check-block warnings at plan time instead. Flip this to
-          # exit-code 1 once the catalog has an agreed baseline to hold.
+          # Reported, not enforced: a scanner cannot tell a deliberate design
+          # choice from an oversight. Every open finding, and the reasoning for
+          # leaving it open, is recorded in SECURITY-BASELINE.md - that file is
+          # the thing to review, not this exit code.
           exit-code: "0"

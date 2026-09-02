@@ -133,11 +133,13 @@ to AWS - for a Route 53 record that is name, type and `set_identifier`.
 
 ## Releasing
 
-Tags are per module, `<module-name>/vX.Y.Z`:
+Tags are per module, `<module-name>/vX.Y.Z`. Use the helper - it refuses a dirty
+tree, refuses a tag that already exists, and runs validate and test for that
+module before tagging:
 
 ```bash
-git tag route53-zone-records/v1.1.0
-git push origin route53-zone-records/v1.1.0
+./tools/tag-release.sh route53-zone-records 1.1.0
+./tools/tag-release.sh route53-zone-records 1.1.0 --push
 ```
 
 The separator is `/` on purpose. With a `-`, the tag `iam-role-v1.0.0` is a

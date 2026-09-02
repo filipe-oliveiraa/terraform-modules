@@ -19,7 +19,7 @@ Single EC2 instance with broad optionality exposed through two objects: `ec2_ins
 ## Example
 ```hcl
 module "ec2" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/Simple/ec2?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/ec2?ref=ec2/v1.0.0"
 
   ec2_instance_optional = {
     ami                         = "ami-0abcdef1234567890"
@@ -45,3 +45,31 @@ module "ec2" {
   }
 }
 ```
+
+## Behaviour worth knowing
+
+**IMDSv2 is the default.** The module always renders a `metadata_options` block
+and sets `http_tokens = "required"` unless you give it a value. An instance that
+still answers IMDSv1 turns any SSRF in an app on the box into "read the instance
+role's credentials", which is the most exploited EC2 misconfiguration there is.
+Setting it is an in-place update, so this replaces nothing. To opt out:
+
+```hcl
+ec2_instance_optional_block = {
+  metadata_options = { http_tokens = "optional" }
+}
+```
+
+**Root volume encryption warns rather than defaults.** If you declare a
+`root_block_device` without `encrypted = true`, a `check` block reports a
+warning on plan and apply - and lets both through. It is a warning and not a
+default because switching encryption on an existing instance forces EC2 to
+replace it; that should be a decision you make, not something that happens on
+your next apply. Note the warning cannot fire when you declare no
+`root_block_device` at all, in which case the volume inherits the AMI's setting.
+
+**An AMI and an instance type are required at plan time.** `aws_instance` needs
+both, or a `launch_template` that supplies them. The module checks this with a
+precondition, so a call missing them fails at plan with a message naming the
+module's inputs, instead of failing minutes into an apply with the provider's
+`"one of ami,launch_template must be specified"`.

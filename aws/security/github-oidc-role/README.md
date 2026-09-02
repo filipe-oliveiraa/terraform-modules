@@ -42,7 +42,7 @@ Built from the GitHub doc example:
 ### Quick start (create provider + role, minimal permissions)
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:ref:refs/heads/main"] # single branch
@@ -56,7 +56,7 @@ module "github_oidc_role" {
 ### Example (create provider + role for a branch with inline policy)
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:ref:refs/heads/main"]
@@ -85,7 +85,7 @@ module "github_oidc_role" {
 ### Example (reuse existing provider, multiple branches)
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name                 = "github-oidc-deploy"
   create_oidc_provider      = false
@@ -111,7 +111,7 @@ data "aws_iam_openid_connect_provider" "github" {
 }
 
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:ref:refs/heads/*"]
@@ -153,7 +153,7 @@ allowed_subjects = ["repo:my-org/*"]
 **Single branch example**
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:ref:refs/heads/main"]
@@ -167,7 +167,7 @@ module "github_oidc_role" {
 **Any branch in a repo**
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:ref:refs/heads/*"]
@@ -181,7 +181,7 @@ module "github_oidc_role" {
 **Any ref in a repo (branches/tags/PR refs)**
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/my-repo:*"]
@@ -195,7 +195,7 @@ module "github_oidc_role" {
 **Any repo in an org (broad — use with caution)**
 ```hcl
 module "github_oidc_role" {
-  source = "../../modules/github_oicd_auth_role"
+  source = "../../aws/security/github-oidc-role"
 
   role_name        = "github-oidc-deploy"
   allowed_subjects = ["repo:my-org/*"]

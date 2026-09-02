@@ -18,7 +18,7 @@ Grants another AWS service or account permission to invoke a Lambda function. Wr
 ## Example (EventBridge rule invoking Lambda)
 ```hcl
 module "lambda_permission_eventbridge" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/Simple/lambda/lambda_permission?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/lambda-permission?ref=lambda-permission/v1.0.0"
 
   action        = "lambda:InvokeFunction"
   function_name = module.lambda.arn

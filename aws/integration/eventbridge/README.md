@@ -20,7 +20,7 @@ Thin wrapper around `terraform-aws-modules/eventbridge/aws` to create a custom b
 ## Example
 ```hcl
 module "events" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/Simple/eventbridge?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/eventbridge?ref=eventbridge/v1.0.0"
 
   bus_name = "apps-bus"
   eventbridge_optional = {

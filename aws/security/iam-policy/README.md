@@ -16,7 +16,7 @@ Creates a standalone IAM policy from a JSON document with optional naming contro
 ## Example
 ```hcl
 module "iam_policy" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/Simple/iam/iam_policy?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/iam-policy?ref=iam-policy/v1.0.0"
 
   policy = data.aws_iam_policy_document.s3_access.json
   iam_policy_optional = {

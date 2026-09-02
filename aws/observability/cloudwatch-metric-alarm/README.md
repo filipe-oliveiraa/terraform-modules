@@ -18,7 +18,7 @@ Creates a single CloudWatch metric alarm with flexible dimensions, actions, and 
 ## Example
 ```hcl
 module "cpu_alarm" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/monitoring_logging/Simple/cloudwatch/cloudwatch_metric_alarm?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/observability/cloudwatch-metric-alarm?ref=cloudwatch-metric-alarm/v1.0.0"
 
   alarm_name          = "high-cpu"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -38,3 +38,19 @@ module "cpu_alarm" {
   }
 }
 ```
+
+## Behaviour worth knowing
+
+**A metric is required at plan time.** `metric_name` (with `namespace`) must be
+set; a precondition catches a call without one instead of letting it fail at
+apply with `"one of evaluation_criteria,metric_name,metric_query must be
+specified"`.
+
+**Metric-math and multi-metric alarms are out of scope.** `metric_query` is
+commented out in both the variable and the resource, so this module handles
+single-metric alarms only.
+
+**Consider `treat_missing_data`.** The AWS default (`missing`) means an alarm
+whose metric stops arriving goes quiet rather than firing - which is the exact
+failure mode most alarms exist to catch. `"breaching"` is usually what you want
+for a liveness-style alarm.

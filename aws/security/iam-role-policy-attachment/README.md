@@ -15,7 +15,7 @@ Attaches a managed policy ARN to a single IAM role. Purpose-built for narrow rol
 ## Example
 ```hcl
 module "role_policy_attachment" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/Simple/iam/iam_role_policy_attachment?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/iam-role-policy-attachment?ref=iam-role-policy-attachment/v1.0.0"
 
   role       = module.iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

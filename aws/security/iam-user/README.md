@@ -16,7 +16,7 @@ Creates a single IAM user with optional path, permissions boundary, and tags. Us
 ## Example
 ```hcl
 module "iam_user" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/Simple/iam/iam_user?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/iam-user?ref=iam-user/v1.0.0"
 
   name = "ci-bot"
   iam_user_optional = {

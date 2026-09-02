@@ -74,3 +74,24 @@ module "route53_private" {
 ## Notes
 - Each record must specify either `records` **or** `alias`, not both (the module enforces this).
 - For public zones, registrar NS changes are required for DNS to propagate.
+
+## Behaviour worth knowing
+
+**Records are keyed by identity, not list position.** The `for_each` key is
+`name_type` plus `set_identifier` when present. It previously included the
+element's index in `var.records`, which meant deleting one record re-keyed every
+record after it - and for DNS, a re-key is a destroy and recreate, so records
+nobody touched went away and came back.
+
+If you are upgrading from a version that used the indexed keys, the first plan
+will want to move every record. Either accept the recreate during a quiet
+window, or realign state without touching DNS:
+
+```bash
+terraform state mv \
+  'module.dns.aws_route53_record.this["app.example.com_A_0"]' \
+  'module.dns.aws_route53_record.this["app.example.com_A"]'
+```
+
+Weighted and latency records legitimately repeat name and type, which is why
+`set_identifier` is part of the key.

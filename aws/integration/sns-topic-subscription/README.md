@@ -19,7 +19,7 @@ Creates an SNS subscription for any supported protocol (HTTP/S, Lambda, SQS, Fir
 ## Example (Lambda subscriber)
 ```hcl
 module "sns_subscription_lambda" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/Simple/sns/sns_topic_subscription?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/sns-topic-subscription?ref=sns-topic-subscription/v1.0.0"
 
   topic_arn = module.sns_topic.arn
   protocol  = "lambda"

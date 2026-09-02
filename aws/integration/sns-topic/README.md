@@ -16,7 +16,7 @@ Creates an SNS topic with full optionality for FIFO, KMS encryption, delivery po
 ## Example
 ```hcl
 module "sns_topic" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/Simple/sns/sns_topic?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/integration/sns-topic?ref=sns-topic/v1.0.0"
 
   sns_topic_optional = {
     name            = "orders-updates"

@@ -15,7 +15,7 @@ Creates a Secrets Manager secret with optional replica configuration and tagging
 ## Example
 ```hcl
 module "secret" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/Simple/secrets_manager/secrets_manager_secret?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/secrets-manager-secret?ref=secrets-manager-secret/v1.0.0"
 
   secretsmanager_secret_optional = {
     name        = "app/db-password"
@@ -28,3 +28,20 @@ module "secret" {
   }
 }
 ```
+
+## Behaviour worth knowing
+
+**This module creates the secret container, never its value.** There used to be
+a `secret_string` input. It was declared and wired to nothing, so setting it
+stored no value in Secrets Manager while still putting the secret into the plan
+output and the state file - the worst of both outcomes.
+
+It was removed rather than wired up, because `aws_secretsmanager_secret_version`
+keeps the plaintext in state permanently, readable by anyone with access to the
+state backend. Put the value in out of band, once:
+
+```bash
+aws secretsmanager put-secret-value --secret-id <name> --secret-string '...'
+```
+
+and let whatever needs it read it at runtime.

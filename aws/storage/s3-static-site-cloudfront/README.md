@@ -91,3 +91,11 @@ module "s3_static_site" {
   }
 }
 ```
+
+## Behaviour worth knowing
+
+**Access logging is opt-in and warned about.** Set `logging_bucket` to enable
+CloudFront access logs. While it is off, a `check` block reports a warning on
+plan and apply without blocking either - the logs cost S3 storage, so the module
+raises the question rather than deciding for you or staying silent. They are
+usually the first thing anyone asks for after an incident.

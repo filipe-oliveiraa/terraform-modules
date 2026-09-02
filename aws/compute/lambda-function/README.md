@@ -20,7 +20,7 @@ Creates an AWS Lambda function with most provider options exposed via a single o
 ## Example (Zip package from S3)
 ```hcl
 module "lambda" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/Simple/lambda/lambda?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/lambda-function?ref=lambda-function/v1.0.0"
 
   function_name = "payments-worker"
   role          = aws_iam_role.lambda_exec.arn
@@ -49,3 +49,16 @@ module "lambda" {
   }
 }
 ```
+
+## Behaviour worth knowing
+
+**Exactly one code source, checked at plan time.** `filename`, `image_uri` and
+`s3_bucket` are mutually exclusive and one of them is required; if you use
+`s3_bucket` you also need `s3_key`. Preconditions enforce both at plan, so a
+call that gets it wrong fails immediately with a message about the module's
+inputs, rather than partway into an apply with the provider's
+`"one of filename,image_uri,s3_bucket must be specified"`.
+
+**No VPC unless you ask.** `vpc_config` is only rendered when you set it -
+attaching a Lambda to a VPC changes its entire egress path, so it stays an
+explicit choice.

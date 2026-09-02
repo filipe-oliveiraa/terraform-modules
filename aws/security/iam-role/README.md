@@ -17,7 +17,7 @@ Creates an IAM role with optional inline policy and common tunables like max ses
 ## Example
 ```hcl
 module "iam_role" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/Simple/iam/iam_role?ref=v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/security/iam-role?ref=iam-role/v1.0.0"
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
   iam_role_optional = {

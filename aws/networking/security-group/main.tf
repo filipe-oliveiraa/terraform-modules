@@ -8,35 +8,56 @@ resource "aws_security_group" "security_group" {
   tags                   = var.security_group_optional.tags
   vpc_id                 = var.security_group_optional.vpc_id
 
-  # Ingress rules
-  dynamic "ingress" {
-    for_each = var.security_group_optional.ingress != null ? var.security_group_optional.ingress : []
-    content {
-      from_port        = ingress.value.from_port # required
-      to_port          = ingress.value.to_port   # required
-      protocol         = ingress.value.protocol  # required
-      cidr_blocks      = lookup(ingress.value, "cidr_blocks", null)
-      description      = lookup(ingress.value, "description", null)
-      ipv6_cidr_blocks = lookup(ingress.value, "ipv6_cidr_blocks", null)
-      prefix_list_ids  = lookup(ingress.value, "prefix_list_ids", null)
-      security_groups  = lookup(ingress.value, "security_groups", null)
-      self             = lookup(ingress.value, "self", null)
-    }
+  # Rules are deliberately NOT inline blocks here. Inline ingress/egress makes
+  # this resource the sole owner of the group's entire rule set: anything that
+  # adds a rule out of band (another module, a controller, a console edit) is
+  # silently reverted on the next apply, and the diff never says why. The
+  # separate rule resources below are individually addressable in state, so a
+  # rule can be added, changed or removed on its own.
+  lifecycle {
+    create_before_destroy = true
   }
+}
 
-  # Egress rules
-  dynamic "egress" {
-    for_each = var.security_group_optional.egress != null ? var.security_group_optional.egress : []
-    content {
-      from_port        = egress.value.from_port # required
-      to_port          = egress.value.to_port   # required
-      protocol         = egress.value.protocol  # required
-      cidr_blocks      = lookup(egress.value, "cidr_blocks", null)
-      description      = lookup(egress.value, "description", null)
-      ipv6_cidr_blocks = lookup(egress.value, "ipv6_cidr_blocks", null)
-      prefix_list_ids  = lookup(egress.value, "prefix_list_ids", null)
-      security_groups  = lookup(egress.value, "security_groups", null)
-      self             = lookup(egress.value, "self", null)
-    }
-  }
+# One resource per rule, keyed by a caller-chosen name so removing a rule from
+# the middle of the map does not re-index (and therefore recreate) the others -
+# which is exactly what a list index would do.
+resource "aws_vpc_security_group_ingress_rule" "this" {
+  for_each = var.ingress_rules
+
+  security_group_id = aws_security_group.security_group.id
+
+  description = each.value.description
+  ip_protocol = each.value.ip_protocol
+
+  # Left null for ip_protocol = "-1" (all protocols), where ports are meaningless.
+  from_port = each.value.from_port
+  to_port   = each.value.to_port
+
+  # Exactly one of these is set per rule - enforced by the variable validation.
+  cidr_ipv4                    = each.value.cidr_ipv4
+  cidr_ipv6                    = each.value.cidr_ipv6
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.referenced_security_group_id
+
+  tags = each.value.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "this" {
+  for_each = var.egress_rules
+
+  security_group_id = aws_security_group.security_group.id
+
+  description = each.value.description
+  ip_protocol = each.value.ip_protocol
+
+  from_port = each.value.from_port
+  to_port   = each.value.to_port
+
+  cidr_ipv4                    = each.value.cidr_ipv4
+  cidr_ipv6                    = each.value.cidr_ipv6
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.referenced_security_group_id
+
+  tags = each.value.tags
 }

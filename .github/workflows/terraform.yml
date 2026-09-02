@@ -81,7 +81,7 @@ jobs:
       # expected here"), which several modules here use to surface cost
       # decisions. Trivy is its supported successor and reads them fine.
       - name: trivy config
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: config
           scan-ref: aws

@@ -27,3 +27,14 @@ variable "s3_bucket_versioning_optional" {
   })
   default = {}
 }
+variable "access_log_bucket" {
+  description = "Bucket to deliver S3 server access logs to. Null (default) leaves access logging off - see the check block in main.tf for why that is a decision worth making rather than inheriting."
+  type        = string
+  default     = null
+}
+
+variable "access_log_prefix" {
+  description = "Key prefix for delivered access logs. Ignored when access_log_bucket is null."
+  type        = string
+  default     = null
+}

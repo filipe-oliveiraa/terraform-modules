@@ -228,3 +228,14 @@ resource "aws_s3_bucket_policy" "oac" {
   bucket = aws_s3_bucket.this.id
   policy = data.aws_iam_policy_document.oac_bucket_access.json
 }
+
+# Suggestions, not requirements. check blocks report a warning on plan and apply
+# and never block either - the right strength for things that cost money, where
+# the module should raise the question rather than answer it for you.
+
+check "cloudfront_access_logging" {
+  assert {
+    condition     = var.logging_bucket != null
+    error_message = "CloudFront access logging is off. Set logging_bucket to enable it. Left off deliberately by default because the logs are billed as S3 storage and requests, but without them there is no record of who fetched what - which is usually the first thing asked for after an incident."
+  }
+}

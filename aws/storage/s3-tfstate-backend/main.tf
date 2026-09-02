@@ -5,10 +5,25 @@ resource "aws_s3_bucket" "s3_bucket" {
 
   # Simple optional arguments
   #region              = var.s3_bucket_optional.region
-  bucket_prefix       = var.s3_bucket_optional.bucket_prefix
-  force_destroy       = var.s3_bucket_optional.force_destroy
-  object_lock_enabled = true
-  tags                = var.s3_bucket_optional.tags
+  bucket_prefix = var.s3_bucket_optional.bucket_prefix
+  force_destroy = var.s3_bucket_optional.force_destroy
+
+  # Defaults to on, because this bucket holds Terraform state and object lock is
+  # what stops a corrupted or truncated state file from overwriting the last
+  # good one. It was previously hardcoded to true, which silently ignored a
+  # caller who set it to false - and object lock cannot be turned off once the
+  # bucket exists, so that is not a decision to make on someone's behalf.
+  object_lock_enabled = coalesce(var.s3_bucket_optional.object_lock_enabled, true)
+
+  tags = var.s3_bucket_optional.tags
+}
+
+resource "aws_s3_bucket_logging" "s3_bucket_logging" {
+  count = var.access_log_bucket != null ? 1 : 0
+
+  bucket        = aws_s3_bucket.s3_bucket.id
+  target_bucket = var.access_log_bucket
+  target_prefix = coalesce(var.access_log_prefix, "${var.bucket_name}/")
 }
 
 # S3 Bucket Versioning to enable versioning for the state files
@@ -42,4 +57,13 @@ resource "aws_s3_bucket_public_access_block" "s3_bucket_public_access_block" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 
+}
+# Suggestion, not a requirement. A check block warns on plan and apply without
+# ever blocking them.
+
+check "state_bucket_access_logging" {
+  assert {
+    condition     = var.access_log_bucket != null
+    error_message = "Server access logging is off on the Terraform state bucket. Set access_log_bucket to enable it. It costs S3 storage for the log objects, which is why it is not on by default - but this bucket holds every resource id and often more, so a record of who read it is worth the few cents."
+  }
 }

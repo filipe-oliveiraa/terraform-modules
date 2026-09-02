@@ -24,4 +24,17 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   evaluate_low_sample_count_percentiles = var.cloudwatch_metric_alarm_optional.evaluate_low_sample_count_percentiles
   #metric_query = var.cloudwatch_metric_alarm_optional.metric_query
   tags = var.cloudwatch_metric_alarm_optional.tags
+
+  lifecycle {
+    # An alarm needs something to alarm on. Without this the module plans with
+    # no metric at all and only fails at apply, with the provider's own
+    # "one of evaluation_criteria,metric_name,metric_query must be specified".
+    # Only metric_name is checked: metric_query is not wired up in this module.
+    # The input and the argument are both commented out above, so metric-math
+    # and multi-metric alarms are out of scope here.
+    precondition {
+      condition     = var.cloudwatch_metric_alarm_optional.metric_name != null
+      error_message = "Set cloudwatch_metric_alarm_optional.metric_name, together with namespace. This module does not support metric_query alarms."
+    }
+  }
 }

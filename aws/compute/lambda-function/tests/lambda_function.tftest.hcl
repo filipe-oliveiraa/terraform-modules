@@ -60,8 +60,8 @@ run "runtime_and_handler_flow_through" {
     lambda_function_optional = {
       filename = "build/function.zip"
       runtime  = "python3.12"
-      handler = "app.handler"
-      timeout = 60
+      handler  = "app.handler"
+      timeout  = 60
     }
   }
 

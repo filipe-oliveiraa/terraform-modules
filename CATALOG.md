@@ -4,26 +4,26 @@
 
 | Module | Type | Creates | Latest tag |
 | --- | --- | --- | --- |
-| [`aws/compute/ec2`](aws/compute/ec2) | Simple | `aws_instance` | `_unreleased_` |
-| [`aws/compute/lambda-function`](aws/compute/lambda-function) | Simple | `aws_lambda_function` | `_unreleased_` |
-| [`aws/compute/lambda-permission`](aws/compute/lambda-permission) | Simple | `aws_lambda_permission` | `_unreleased_` |
-| [`aws/integration/eventbridge`](aws/integration/eventbridge) | Simple | `terraform-aws-modules/eventbridge/aws` | `_unreleased_` |
-| [`aws/integration/sns-topic`](aws/integration/sns-topic) | Simple | `aws_sns_topic` | `_unreleased_` |
-| [`aws/integration/sns-topic-subscription`](aws/integration/sns-topic-subscription) | Simple | `aws_sns_topic_subscription` | `_unreleased_` |
-| [`aws/networking/route53-zone-records`](aws/networking/route53-zone-records) | Complex | `aws_route53_record, aws_route53_zone` | `_unreleased_` |
-| [`aws/networking/security-group`](aws/networking/security-group) | Complex | `aws_security_group, aws_vpc_security_group_egress_rule, aws_vpc_security_group_ingress_rule` | `_unreleased_` |
-| [`aws/observability/cloudwatch-metric-alarm`](aws/observability/cloudwatch-metric-alarm) | Simple | `aws_cloudwatch_metric_alarm` | `_unreleased_` |
-| [`aws/security/github-oidc-role`](aws/security/github-oidc-role) | Complex | `aws_iam_openid_connect_provider, aws_iam_role, aws_iam_role_policy, aws_iam_role_policy_attachment` | `_unreleased_` |
-| [`aws/security/iam-policy`](aws/security/iam-policy) | Simple | `aws_iam_policy` | `_unreleased_` |
-| [`aws/security/iam-policy-attachment`](aws/security/iam-policy-attachment) | Simple | `aws_iam_policy_attachment` | `_unreleased_` |
-| [`aws/security/iam-policy-lambda-s3-mirror`](aws/security/iam-policy-lambda-s3-mirror) | Simple | `aws_iam_policy` | `_unreleased_` |
-| [`aws/security/iam-role`](aws/security/iam-role) | Simple | `aws_iam_role` | `_unreleased_` |
-| [`aws/security/iam-role-policy-attachment`](aws/security/iam-role-policy-attachment) | Simple | `aws_iam_role_policy_attachment` | `_unreleased_` |
-| [`aws/security/iam-user`](aws/security/iam-user) | Simple | `aws_iam_user` | `_unreleased_` |
-| [`aws/security/secrets-manager-secret`](aws/security/secrets-manager-secret) | Simple | `aws_secretsmanager_secret` | `_unreleased_` |
-| [`aws/storage/s3-bucket-replication`](aws/storage/s3-bucket-replication) | Complex | `aws_iam_role, aws_iam_role_policy, aws_s3_bucket_replication_configuration` | `_unreleased_` |
-| [`aws/storage/s3-static-site-cloudfront`](aws/storage/s3-static-site-cloudfront) | Complex | `aws_cloudfront_distribution, aws_cloudfront_origin_access_control, aws_s3_bucket, aws_s3_bucket_ownership_controls, aws_s3_bucket_policy, aws_s3_bucket_public_access_block, aws_s3_bucket_server_side_encryption_configuration, aws_s3_bucket_versioning, aws_s3_bucket_website_configuration` | `_unreleased_` |
-| [`aws/storage/s3-tfstate-backend`](aws/storage/s3-tfstate-backend) | Complex | `aws_s3_bucket, aws_s3_bucket_logging, aws_s3_bucket_public_access_block, aws_s3_bucket_server_side_encryption_configuration, aws_s3_bucket_versioning` | `_unreleased_` |
+| [`aws/compute/ec2`](aws/compute/ec2) | Simple | `aws_instance` | `ec2/v1.0.0` |
+| [`aws/compute/lambda-function`](aws/compute/lambda-function) | Simple | `aws_lambda_function` | `lambda-function/v1.0.0` |
+| [`aws/compute/lambda-permission`](aws/compute/lambda-permission) | Simple | `aws_lambda_permission` | `lambda-permission/v1.0.0` |
+| [`aws/integration/eventbridge`](aws/integration/eventbridge) | Simple | `terraform-aws-modules/eventbridge/aws` | `eventbridge/v1.0.0` |
+| [`aws/integration/sns-topic`](aws/integration/sns-topic) | Simple | `aws_sns_topic` | `sns-topic/v1.0.0` |
+| [`aws/integration/sns-topic-subscription`](aws/integration/sns-topic-subscription) | Simple | `aws_sns_topic_subscription` | `sns-topic-subscription/v1.0.0` |
+| [`aws/networking/route53-zone-records`](aws/networking/route53-zone-records) | Complex | `aws_route53_record, aws_route53_zone` | `route53-zone-records/v1.0.0` |
+| [`aws/networking/security-group`](aws/networking/security-group) | Complex | `aws_security_group, aws_vpc_security_group_egress_rule, aws_vpc_security_group_ingress_rule` | `security-group/v2.0.0` |
+| [`aws/observability/cloudwatch-metric-alarm`](aws/observability/cloudwatch-metric-alarm) | Simple | `aws_cloudwatch_metric_alarm` | `cloudwatch-metric-alarm/v1.0.0` |
+| [`aws/security/github-oidc-role`](aws/security/github-oidc-role) | Complex | `aws_iam_openid_connect_provider, aws_iam_role, aws_iam_role_policy, aws_iam_role_policy_attachment` | `github-oidc-role/v1.0.0` |
+| [`aws/security/iam-policy`](aws/security/iam-policy) | Simple | `aws_iam_policy` | `iam-policy/v1.0.0` |
+| [`aws/security/iam-policy-attachment`](aws/security/iam-policy-attachment) | Simple | `aws_iam_policy_attachment` | `iam-policy-attachment/v1.0.0` |
+| [`aws/security/iam-policy-lambda-s3-mirror`](aws/security/iam-policy-lambda-s3-mirror) | Simple | `aws_iam_policy` | `iam-policy-lambda-s3-mirror/v1.0.0` |
+| [`aws/security/iam-role`](aws/security/iam-role) | Simple | `aws_iam_role` | `iam-role/v1.0.0` |
+| [`aws/security/iam-role-policy-attachment`](aws/security/iam-role-policy-attachment) | Simple | `aws_iam_role_policy_attachment` | `iam-role-policy-attachment/v1.0.0` |
+| [`aws/security/iam-user`](aws/security/iam-user) | Simple | `aws_iam_user` | `iam-user/v1.0.0` |
+| [`aws/security/secrets-manager-secret`](aws/security/secrets-manager-secret) | Simple | `aws_secretsmanager_secret` | `secrets-manager-secret/v1.0.0` |
+| [`aws/storage/s3-bucket-replication`](aws/storage/s3-bucket-replication) | Complex | `aws_iam_role, aws_iam_role_policy, aws_s3_bucket_replication_configuration` | `s3-bucket-replication/v1.0.0` |
+| [`aws/storage/s3-static-site-cloudfront`](aws/storage/s3-static-site-cloudfront) | Complex | `aws_cloudfront_distribution, aws_cloudfront_origin_access_control, aws_s3_bucket, aws_s3_bucket_ownership_controls, aws_s3_bucket_policy, aws_s3_bucket_public_access_block, aws_s3_bucket_server_side_encryption_configuration, aws_s3_bucket_versioning, aws_s3_bucket_website_configuration` | `s3-static-site-cloudfront/v1.0.0` |
+| [`aws/storage/s3-tfstate-backend`](aws/storage/s3-tfstate-backend) | Complex | `aws_s3_bucket, aws_s3_bucket_logging, aws_s3_bucket_public_access_block, aws_s3_bucket_server_side_encryption_configuration, aws_s3_bucket_versioning` | `s3-tfstate-backend/v1.0.0` |
 
 ## Using one
 

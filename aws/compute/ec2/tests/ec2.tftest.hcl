@@ -79,6 +79,63 @@ run "scalar_arguments_flow_through" {
 # matters - this module never sets it on the caller's behalf - is visible in
 # main.tf, where it is a plain pass-through of the input.
 
+run "root_volume_is_encrypted_by_default" {
+  command = plan
+
+  variables {
+    ec2_instance_optional = { ami = "ami-0123456789abcdef0", instance_type = "t3.micro" }
+  }
+
+  # The whole point of rendering root_block_device unconditionally: a caller who
+  # passes no block at all still gets an encrypted root volume, instead of
+  # inheriting whatever the AMI happens to carry.
+  assert {
+    condition     = aws_instance.ec2_instance.root_block_device[0].encrypted == true
+    error_message = "A call with no root_block_device must still produce an encrypted root volume."
+  }
+}
+
+run "explicit_encrypted_wins_over_the_default" {
+  command = plan
+
+  variables {
+    ec2_instance_optional = { ami = "ami-0123456789abcdef0", instance_type = "t3.micro" }
+    ec2_instance_optional_block = {
+      root_block_device = { encrypted = false, volume_size = 20 }
+    }
+  }
+
+  # Secure by default, not a cage - the same rule as the IMDSv2 default.
+  assert {
+    condition     = aws_instance.ec2_instance.root_block_device[0].encrypted == false
+    error_message = "An explicit encrypted value inside root_block_device must win over encrypt_root_volume."
+  }
+
+  assert {
+    condition     = aws_instance.ec2_instance.root_block_device[0].volume_size == 20
+    error_message = "Other root_block_device settings must still flow through."
+  }
+}
+
+run "encrypt_root_volume_false_opts_out_and_warns" {
+  command = plan
+
+  variables {
+    ec2_instance_optional = { ami = "ami-0123456789abcdef0", instance_type = "t3.micro" }
+    encrypt_root_volume   = false
+  }
+
+  assert {
+    condition     = aws_instance.ec2_instance.root_block_device[0].encrypted == false
+    error_message = "encrypt_root_volume = false must be honoured."
+  }
+
+  # Opting out is allowed, but it should never be silent.
+  expect_failures = [
+    check.root_volume_encryption,
+  ]
+}
+
 run "nested_blocks_render_only_when_set" {
   command = plan
 
@@ -96,12 +153,14 @@ run "nested_blocks_render_only_when_set" {
   }
 
   assert {
-    condition     = length(aws_instance.ec2_instance.root_block_device) == 1
-    error_message = "Setting root_block_device must render exactly one block."
+    condition     = aws_instance.ec2_instance.root_block_device[0].volume_size == 20
+    error_message = "root_block_device values must flow through."
   }
 
+  # cpu_options is still conditional, so it is the honest test that omitted
+  # blocks stay omitted - root_block_device is now always rendered.
   assert {
-    condition     = aws_instance.ec2_instance.root_block_device[0].encrypted == true
-    error_message = "root_block_device values must flow through."
+    condition     = length(aws_instance.ec2_instance.cpu_options) == 0
+    error_message = "A block the caller did not set must not be rendered."
   }
 }

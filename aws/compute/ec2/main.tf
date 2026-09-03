@@ -147,19 +147,29 @@ resource "aws_instance" "ec2_instance" {
     }
   }
 
-  dynamic "root_block_device" {
+  # Always rendered, like metadata_options above, so the root volume is
+  # encrypted by default rather than inheriting whatever the AMI happens to do.
+  #
+  # This block used to appear only when the caller passed root_block_device,
+  # which meant the common call - no block at all - produced an instance whose
+  # root volume encryption was simply whatever the AMI carried, with nothing in
+  # the module saying so either way.
+  #
+  # Precedence: an explicit `encrypted` inside root_block_device wins, then
+  # var.encrypt_root_volume, which defaults to true.
+  root_block_device {
+    encrypted = coalesce(
+      try(var.ec2_instance_optional_block.root_block_device.encrypted, null),
+      var.encrypt_root_volume,
+    )
 
-    for_each = var.ec2_instance_optional_block.root_block_device != null ? [1] : []
-    content {
-      delete_on_termination = var.ec2_instance_optional_block.root_block_device.delete_on_termination
-      encrypted             = var.ec2_instance_optional_block.root_block_device.encrypted
-      iops                  = var.ec2_instance_optional_block.root_block_device.iops
-      kms_key_id            = var.ec2_instance_optional_block.root_block_device.kms_key_id
-      tags                  = var.ec2_instance_optional_block.root_block_device.tags
-      throughput            = var.ec2_instance_optional_block.root_block_device.throughput
-      volume_size           = var.ec2_instance_optional_block.root_block_device.volume_size
-      volume_type           = var.ec2_instance_optional_block.root_block_device.volume_type
-    }
+    delete_on_termination = try(var.ec2_instance_optional_block.root_block_device.delete_on_termination, null)
+    iops                  = try(var.ec2_instance_optional_block.root_block_device.iops, null)
+    kms_key_id            = try(var.ec2_instance_optional_block.root_block_device.kms_key_id, null)
+    tags                  = try(var.ec2_instance_optional_block.root_block_device.tags, null)
+    throughput            = try(var.ec2_instance_optional_block.root_block_device.throughput, null)
+    volume_size           = try(var.ec2_instance_optional_block.root_block_device.volume_size, null)
+    volume_type           = try(var.ec2_instance_optional_block.root_block_device.volume_type, null)
   }
 
   lifecycle {
@@ -188,11 +198,8 @@ resource "aws_instance" "ec2_instance" {
 
 check "root_volume_encryption" {
   assert {
-    condition = (
-      var.ec2_instance_optional_block.root_block_device == null ||
-      try(var.ec2_instance_optional_block.root_block_device.encrypted, false) == true
-    )
-    error_message = "Root volume is not explicitly encrypted. Set root_block_device.encrypted = true. This is only a warning because switching encryption on an existing instance forces EC2 to replace it - decide deliberately rather than on the next apply."
+    condition     = var.encrypt_root_volume == true
+    error_message = "encrypt_root_volume is false, so this instance's root volume is unencrypted unless its AMI is. That is a valid choice - this warning exists so it stays a visible one."
   }
 }
 

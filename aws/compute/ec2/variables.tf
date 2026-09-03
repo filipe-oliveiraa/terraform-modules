@@ -120,4 +120,20 @@ variable "ec2_instance_optional_block" {
   # Every attribute is optional, so an omitted object is a valid call.
   default = {}
 }
- 
+
+variable "encrypt_root_volume" {
+  description = <<-EOT
+    Encrypt the instance's root EBS volume. Defaults to true.
+
+    An explicit `encrypted` inside ec2_instance_optional_block.root_block_device
+    takes precedence over this, so callers who already set it are unaffected.
+
+    Set false only deliberately. Note that AWS cannot encrypt an existing root
+    volume in place: the provider documents that "modifying the encrypted or
+    kms_key_id settings of the root_block_device requires resource
+    replacement", which is why flipping this on an instance that already exists
+    destroys and recreates it.
+  EOT
+  type        = bool
+  default     = true
+}

@@ -19,7 +19,7 @@ Single EC2 instance with broad optionality exposed through two objects: `ec2_ins
 ## Example
 ```hcl
 module "ec2" {
-  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/ec2?ref=ec2/v1.0.0"
+  source = "git::https://github.com/filipe-oliveiraa/terraform-modules.git//aws/compute/ec2?ref=ec2/v2.0.0"
 
   ec2_instance_optional = {
     ami                         = "ami-0abcdef1234567890"
@@ -60,13 +60,28 @@ ec2_instance_optional_block = {
 }
 ```
 
-**Root volume encryption warns rather than defaults.** If you declare a
-`root_block_device` without `encrypted = true`, a `check` block reports a
-warning on plan and apply - and lets both through. It is a warning and not a
-default because switching encryption on an existing instance forces EC2 to
-replace it; that should be a decision you make, not something that happens on
-your next apply. Note the warning cannot fire when you declare no
-`root_block_device` at all, in which case the volume inherits the AMI's setting.
+**The root volume is encrypted by default.** `root_block_device` is rendered
+unconditionally with `encrypted = true`, so a call that passes no block at all
+still gets an encrypted root volume rather than inheriting whatever the AMI
+carries.
+
+Precedence, most specific first:
+
+1. `ec2_instance_optional_block.root_block_device.encrypted`
+2. `encrypt_root_volume` (defaults to `true`)
+
+Opting out is allowed and warns rather than blocking:
+
+```hcl
+encrypt_root_volume = false   # check block reports a warning; the plan proceeds
+```
+
+**Upgrading an existing instance to v2 replaces it.** The provider is explicit:
+"modifying the `encrypted` or `kms_key_id` settings of the `root_block_device`
+requires resource replacement". If you have instances created with v1 and no
+`root_block_device`, `terraform plan` will show a replacement. Either accept it
+in a maintenance window, or pin `encrypt_root_volume = false` to keep the old
+behaviour and decide later.
 
 **An AMI and an instance type are required at plan time.** `aws_instance` needs
 both, or a `launch_template` that supplies them. The module checks this with a

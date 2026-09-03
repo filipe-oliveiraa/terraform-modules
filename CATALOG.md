@@ -4,7 +4,7 @@
 
 | Module | Type | Creates | Latest tag |
 | --- | --- | --- | --- |
-| [`aws/compute/ec2`](aws/compute/ec2) | Simple | `aws_instance` | `ec2/v1.0.0` |
+| [`aws/compute/ec2`](aws/compute/ec2) | Simple | `aws_instance` | `ec2/v2.0.0` |
 | [`aws/compute/lambda-function`](aws/compute/lambda-function) | Simple | `aws_lambda_function` | `lambda-function/v1.0.0` |
 | [`aws/compute/lambda-permission`](aws/compute/lambda-permission) | Simple | `aws_lambda_permission` | `lambda-permission/v1.0.0` |
 | [`aws/integration/eventbridge`](aws/integration/eventbridge) | Simple | `terraform-aws-modules/eventbridge/aws` | `eventbridge/v1.0.0` |
